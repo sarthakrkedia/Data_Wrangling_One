@@ -1,0 +1,1913 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h1>Data Wrangling</h1>\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3 style=\"color:red\">Task 1 Started </h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<p style=\"color:green;font-weight: bold;font-style: italic;\">The Task 1 is about Parsing the property sales data stored in “data.dat\"\n",
+    "<br>\n",
+    "First Step is to examine and load the data into a Pandas DataFrame.\n",
+    "I have parsed the loaded data so that each sales record has the following attributes:\n",
+    "</p>\n",
+    "<table style=\"width:100%; border: 1px solid black;\">\n",
+    "<tr>\n",
+    "<th>Attribute</th>\n",
+    "<th>Description</th>\n",
+    "</tr>\n",
+    "<!-- Date-->\n",
+    "<tr>\n",
+    "<td>Date</td>\n",
+    "<td>Date of the property sold, e.g., 20140502T000000</td>\n",
+    "</tr>\n",
+    "<!-- Price-->\n",
+    "<tr>\n",
+    "<td>price</td>\n",
+    "<td>Property sold price</td>\n",
+    "</tr>\n",
+    "<!-- BedRooms-->\n",
+    "<tr>\n",
+    "<td>bedrooms</td>\n",
+    "<td>Number of bedrooms</td>\n",
+    "</tr>\n",
+    "<!-- BathRooms-->\n",
+    "<tr>\n",
+    "<td>bathrooms</td>\n",
+    "<td>Number of bathrooms, the value of which can be either an integer or a fraction ending with .25, .5, and .75. For example, 0.5 accounts for a room with a toilet but no shower </td>\n",
+    "</tr>\n",
+    "<!-- Square Feet Living Area-->\n",
+    "<tr>\n",
+    "<td>sqft_living</td>\n",
+    "<td>Square footage of the property's interior living space, it is equal to the sum of basement area (i.e., sqft_basement) and the above living area (i.e., sqft_above) </td>\n",
+    "</tr>\n",
+    "<!-- Square Feet Lot Area-->\n",
+    "<tr>\n",
+    "<td>sqft_lot</td>\n",
+    "<td>Square footage of the land space</td>\n",
+    "</tr>\n",
+    "<!-- Floors-->\n",
+    "<tr>\n",
+    "<td>floors</td>\n",
+    "<td>Number of floors</td>\n",
+    "</tr>\n",
+    "<!-- Water Front-->\n",
+    "<tr>\n",
+    "<td>waterfront</td>\n",
+    "<td>Whether the property was overlooking the waterfront or not</td>\n",
+    "</tr>\n",
+    "<!-- View-->\n",
+    "<tr>\n",
+    "<td>view</td>\n",
+    "<td>An index from 0 to 4 of how good the view of the property was</td>\n",
+    "</tr>\n",
+    "<!-- Condition-->\n",
+    "<tr>\n",
+    "<td>condition</td>\n",
+    "<td>An index from 1 to 5 on the condition of the property.</td>\n",
+    "</tr>\n",
+    "<!-- Square Feet  Above-->\n",
+    "<tr>\n",
+    "<td>sqft_above</td>\n",
+    "<td>The square footage of the interior living space that is above ground level </td>\n",
+    "</tr>\n",
+    "<!-- Square Feet Basement-->\n",
+    "<tr>\n",
+    "<td>sqft_basement</td>\n",
+    "<td>The square footage of the interior living space that is below ground level </td>\n",
+    "</tr>\n",
+    "<!-- Year Built-->\n",
+    "<tr>\n",
+    "<td>yr_built</td>\n",
+    "<td>The year the property was initially built </td>\n",
+    "</tr>\n",
+    "<!-- Year Renovated-->\n",
+    "<tr>\n",
+    "<td>yr_renovated</td>\n",
+    "<td>The year of the property's last renovation</td>\n",
+    "</tr>\n",
+    "<!-- Street-->\n",
+    "<tr>\n",
+    "<td>street</td>\n",
+    "<td>The street address of the property, e.g., “3140 Franklin Ave E”</td>\n",
+    "</tr>\n",
+    "<!-- City-->\n",
+    "<tr>\n",
+    "<td>city</td>\n",
+    "<td>The city where the property is, e.g., “Seattle”</td>\n",
+    "</tr>\n",
+    "<!-- State and Zip Code-->\n",
+    "<tr>\n",
+    "<td>statezip</td>\n",
+    "<td>The zip code area where the property is, which contains state and zip code, separated by a space. For example, “WA 98115”, where WA is the abbreviation of Washington and the number is the zip code.</td>\n",
+    "</tr>\n",
+    "<!-- Country-->\n",
+    "<tr>\n",
+    "<td>country</td>\n",
+    "<td>The country where the property is, e.g., “USA”</td>\n",
+    "</tr>\n",
+    "</table>\n",
+    "<p style=\"color:green;font-weight: bold;font-style: italic;\">\n",
+    " Now I have a DataFrame where each row is a sales record and each column is one of the attributes listed in the table above. All the columns are labeled with attribute names shown in the table and also have a proper data type (e.g., integer, string, float, date, etc).\n",
+    "</p>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/anaconda3/lib/python3.7/site-packages/sklearn/cross_validation.py:41: DeprecationWarning: This module was deprecated in version 0.18 in favor of the model_selection module into which all the refactored classes and functions are moved. Also note that the interface of the new CV iterators are different from that of this module. This module will be removed in 0.20.\n",
+      "  \"This module will be removed in 0.20.\", DeprecationWarning)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Importing Libraries\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "import json\n",
+    "#import seaborn as sns\n",
+    "from pandas.io.json import json_normalize\n",
+    "import re as re\n",
+    "import datetime as dt\n",
+    "from dateutil.parser import parse # for date format check\n",
+    "from sklearn.linear_model import LinearRegression # for price prediction\n",
+    "from sklearn.cross_validation import train_test_split # for splitting the data\n",
+    "% matplotlib inline"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Opening File Data and Converting it into pandas Dataframe\n",
+    "file_handle=open('data.dat')\n",
+    "#print (file_handle.read())\n",
+    "file_data=file_handle.read()\n",
+    "file_data=json.loads(file_data) # Loading the Data into a json python dictionary\n",
+    "file_handle.close() # Closing file Handle\n",
+    "#print (type(file_data))\n",
+    "dataframe = json_normalize(file_data['houses']) # Creating a dataframe based on json dictionary\n",
+    "#print (type(dataframe))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [],
+   "source": [
+    "# Assigning Data Types and Creating Data Columns\n",
+    "#print (dataframe.shape)\n",
+    "#print (dataframe.describe())\n",
+    "# Finding Street Address, City, Country and statezip from address\n",
+    "address_list=dataframe['address'].tolist()\n",
+    "street_address=[]\n",
+    "country=[]\n",
+    "statezip=[]\n",
+    "city=[]\n",
+    "for address in address_list:\n",
+    "    address_list=address.split(',')\n",
+    "    if len(address_list) !=4:\n",
+    "        print (\"Address not formatted\")\n",
+    "    street_address.append(address_list[0].strip())\n",
+    "    city.append(address_list[1].strip())\n",
+    "    statezip.append(address_list[2].strip())\n",
+    "    country.append(address_list[3].strip())\n",
+    "dataframe['country']=country # Adding to data frame\n",
+    "dataframe['street']=street_address# Adding to data frame\n",
+    "dataframe['city']=city# Adding to data frame\n",
+    "dataframe['statezip']=statezip# Adding to data frame\n",
+    "dataframe.tail()\n",
+    "#dataframe.shape\n",
+    "# Creating sqft_living and sqft_lot\n",
+    "sqft_list=dataframe['area.sqft_living/sqft_lot'].tolist()\n",
+    "sqft_living=[]\n",
+    "sqft_lot=[]\n",
+    "for area in sqft_list:\n",
+    "    #print (area)\n",
+    "    area_list=area.split(\"=\")\n",
+    "    if area_list[0]!=\"sqft_living/sqft_lot\":\n",
+    "        print (\"Error\")\n",
+    "    else:\n",
+    "        area_list=area_list[1].split(\" \")\n",
+    "        #print (area_list[0][:-1])\n",
+    "        sqft_living.append(area_list[0][:-1])\n",
+    "        sqft_lot.append(area_list[1])\n",
+    "dataframe['sqft_living']=sqft_living # appending new series to dataframe\n",
+    "dataframe['sqft_lot']=sqft_lot # appending new series to dataframe"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "# Creating number of bathrooms and bedrooms\n",
+    "# Note in some rows no of bathrooms is after the no of bedrooms\n",
+    "dataframe.head()\n",
+    "rooms_list=dataframe['rooms'].tolist() # Converting them to a list and not changing the order\n",
+    "bedrooms=[]\n",
+    "bathrooms=[]\n",
+    "room_data=[]\n",
+    "updated_rooms=[]\n",
+    "for rooms in rooms_list:\n",
+    "    #print (rooms)\n",
+    "    rooms=rooms.split(';')\n",
+    "    #print (rooms)\n",
+    "    room_data=rooms[0].split(':')\n",
+    "    if room_data[0][10:] !=\"bathrooms\":\n",
+    "        rooms.reverse() # Reversing the order of bathroom and bedroom\n",
+    "        updated_rooms.append(rooms)\n",
+    "    else:\n",
+    "        updated_rooms.append(rooms)\n",
+    "for room in updated_rooms:\n",
+    "    room[0]=room[0].strip()\n",
+    "    room[1]=room[1].strip()\n",
+    "    #print (room[1])\n",
+    "    bathrooms.append(room[0][21:]) # finding number of bathrooms\n",
+    "    bedrooms.append(room[1][20:])# finding number of bedrooms\n",
+    "dataframe['bedrooms']=bedrooms # appending new series to dataframe\n",
+    "dataframe['bathrooms']=bathrooms# appending new series to dataframe\n",
+    "dataframe.head()\n",
+    "dataframe.drop('address',inplace=True,axis=1) # Dropping Address Column\n",
+    "dataframe.drop('area.sqft_living/sqft_lot',inplace=True,axis=1) # Dropping area.sqft_living/sqft_lot Column\n",
+    "dataframe.drop('rooms',inplace=True,axis=1) # Dropping rooms Column\n",
+    "#dataframe.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "# Renaming Columns and Ordering \n",
+    "#print (dataframe.columns)\n",
+    "dataframe.rename(columns={ \"area.sqft_above\": \"sqft_above\",\"area.sqft_basement\":\"sqft_basement\"},inplace=True)\n",
+    "dataframe = dataframe[['date', 'price', 'bedrooms','bathrooms','sqft_living','sqft_lot','floors','waterfront'\n",
+    "                       ,'view','condition','sqft_above','sqft_basement','yr_built','yr_renovated',\n",
+    "                      'street','city','statezip','country']]\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "date              object\n",
+      "price            float64\n",
+      "bedrooms           int64\n",
+      "bathrooms        float64\n",
+      "sqft_living        int64\n",
+      "sqft_lot           int64\n",
+      "floors           float64\n",
+      "waterfront         int64\n",
+      "view               int64\n",
+      "condition          int64\n",
+      "sqft_above         int64\n",
+      "sqft_basement      int64\n",
+      "yr_built           int64\n",
+      "yr_renovated       int64\n",
+      "street            object\n",
+      "city              object\n",
+      "statezip          object\n",
+      "country           object\n",
+      "dtype: object\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Changing Types of columns\n",
+    "dataframe.dtypes\n",
+    "# Changing Date Column Type to Date from Object\n",
+    "# 23 05 2014\n",
+    "# changing bedroom to int\n",
+    "dataframe['bedrooms']=dataframe.bedrooms.astype('int')\n",
+    "dataframe.dtypes\n",
+    "# changing bathroom to float\n",
+    "dataframe['bathrooms']=dataframe.bathrooms.astype('float')\n",
+    "# changing sqft_living to float\n",
+    "dataframe['sqft_living']=dataframe.sqft_living.astype('int')\n",
+    "# Chanign sqft_lot to float\n",
+    "dataframe['sqft_lot']=dataframe.sqft_lot.astype('int')\n",
+    "# Changing Year_Renovated to int\n",
+    "# As we cannot convert Nan to int \n",
+    "# Nan values means that the property hasnt been renovated \n",
+    "# So replacing Nan values to 0 \n",
+    "dataframe.yr_renovated=dataframe.yr_renovated.fillna(0).astype(int)\n",
+    "print (dataframe.dtypes)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "\n",
+    "<h5 style=\"color:red\"> Date is still an object because there are some issues with its format \n",
+    " I will convert it after removing all the issues </h5>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3 style=\"color:red\">Task 1 Finished </h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3 style=\"color:red\">Task 2 Started </h3>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<p style=\"color:green;font-weight: bold;font-style: italic;\">In this task, I have inspected and audited the data to identify the data problems and then fixed the problems. \n",
+    "Different generic and major data problems found in the data included:\n",
+    "</p>\n",
+    "<ul style=\"color:black;font-weight: bold;font-style: italic;\">\n",
+    "<li>Lexical errors, e.g., typos and spelling mistakes</li>\n",
+    "<li>Irregularities, e.g., abnormal data values and data formats</li>\n",
+    "<li>Violations of the Integrity constraint.</li>\n",
+    "<li>Outliers</li>\n",
+    "<li>Duplications</li>\n",
+    "<li>Missing values</li>\n",
+    "<li>Inconsistency, e.g., inhomogeneity in values and types in representing the same data</li>\n",
+    "</ul>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:red\">\n",
+    "<h4>Step 1 is to remove the Lexical Errors</h4>\n",
+    "<h5>Lexical Errors are usually found in String (object) data types<br>\n",
+    "Objects data types in this data frame are street,city,statezip and country</h5>\n",
+    "<p>There is only one country in the dataset that is USA <br>\n",
+    "There is only one State that is WA or Washington D.C<br>\n",
+    "The range of the zip code is 98001 to 94403<br>\n",
+    "All of them are inside washington boundries\n",
+    "<br>\n",
+    "</p>\n",
+    "</div>\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['USA']\n",
+      "{'WA'}\n",
+      "77\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Country should be USA\n",
+    "print (dataframe.country.unique())\n",
+    "\n",
+    "# Checking Lexical Errors for State Zip. The format is 0000 AA where 0000 is the zip code and AA is the state acronym\n",
+    "statelist=dataframe['statezip'].tolist()\n",
+    "unique_state_set=[]\n",
+    "for states in statelist:\n",
+    "    unique_state_set.append(states[:2])\n",
+    "print (set(unique_state_set))\n",
+    "# Only state is  WA or Washington, D.C\n",
+    "\n",
+    "\n",
+    "# Now All the Zip codes should be from Washington D.C as well\n",
+    "# The range of Washington zip codes is 98001  to 99403\n",
+    "# Checking Zip code\n",
+    "zip_list=[]\n",
+    "for states in statelist:\n",
+    "    zip_list.append(int(states[3:]))\n",
+    "for zip in zip_list:\n",
+    "    if zip < 98001 or zip > 99403:\n",
+    "        print (\"Error! Zip code and state doesnt match\")\n",
+    "zip_set=set(zip_list)\n",
+    "print (len(zip_set))\n",
+    "## 77 Unqiue Zip Codes and all in Washington D.C\n",
+    "# No errors found in Statezip values \n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:red\">\n",
+    "<h5>Spelling Mistakes in Cities column</h5>\n",
+    "<p> A lot of spelling mistakes were found in Cities which I have rectified in the <br>\n",
+    "following code</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "45"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Checking city for lexical errors\n",
+    "# The city Auburn is misspelled as Auburnt and auburn and as Auburn \n",
+    "# Converting them to Auburn\n",
+    "dataframe.city.replace({'Auburnt':'Auburn','auburn':'Auburn'},inplace=True)\n",
+    "# The City Sammamish has been misspelled as samamish and sammamish\n",
+    "dataframe.city.replace({'Samamish':'Sammamish','sammamish':'Sammamish'},inplace=True)\n",
+    "# The City Seattle  has been misspelled as seattle and Seaattle and Seatle\n",
+    "dataframe.city.replace({'Seaattle':'Seattle','Seatle':'Seattle','seattle':'Seattle'},inplace=True)\n",
+    "# The city Redmond has beeen misspelled and mistyped as Redmonde and redmond and Redmund\n",
+    "dataframe.city.replace({'Redmonde':'Redmond','redmond':'Redmond','Redmund':'Redmond'},inplace=True)\n",
+    "# The city Bellevue has been  misspelled and mistyped as Bellvue  and Bellevue and Belleview\n",
+    "dataframe.city.replace({'Bellvue':'Bellevue','Bellevue':'Bellevue','Belleview':'Bellvue'},inplace=True)\n",
+    "# The city Kirkland has been  misspelled and mistyped as Kirklund \n",
+    "dataframe.city.replace({'Kirklund':'Kirkland'},inplace=True)\n",
+    "# The city Issaquah has been  misspelled and mistyped as Issaguah\n",
+    "dataframe.city.replace({'Issaguah':'Issaquah'},inplace=True)\n",
+    "# The city Woodinville has been  misspelled and mistyped as Woodenville\n",
+    "dataframe.city.replace({'Woodenville':'Woodinville'},inplace=True)\n",
+    "# The city Carnation has been  misspelled and mistyped as Coronation\n",
+    "dataframe.city.replace({'Coronation':'Carnation'},inplace=True)\n",
+    "# The city Snoqualmie has been  misspelled and mistyped as Snogualmie\n",
+    "dataframe.city.replace({'Snogualmie':'Snoqualmie'},inplace=True)\n",
+    "# The city Shoreline has been  misspelled and mistyped as Sureline\n",
+    "dataframe.city.replace({'Sureline':'Shoreline'},inplace=True)\n",
+    "# 45 Unique Cities\n",
+    "len(dataframe.city.unique())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:green\">\n",
+    "<h5>Lexical Errors have been removed</h5>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:red\">\n",
+    "<h5>Step 2 is to remove Irregularities such as abnormal data values and data formats</h5>\n",
+    "<p>The first issue was with the dates in the dataset <br>\n",
+    "which have been fixed in the code below and the data has been converted to its proper datetime format</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>date</th>\n",
+       "      <th>price</th>\n",
+       "      <th>bedrooms</th>\n",
+       "      <th>bathrooms</th>\n",
+       "      <th>sqft_living</th>\n",
+       "      <th>sqft_lot</th>\n",
+       "      <th>floors</th>\n",
+       "      <th>waterfront</th>\n",
+       "      <th>view</th>\n",
+       "      <th>condition</th>\n",
+       "      <th>sqft_above</th>\n",
+       "      <th>sqft_basement</th>\n",
+       "      <th>yr_built</th>\n",
+       "      <th>yr_renovated</th>\n",
+       "      <th>street</th>\n",
+       "      <th>city</th>\n",
+       "      <th>statezip</th>\n",
+       "      <th>country</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>20140502T000000</td>\n",
+       "      <td>313000.0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>1.50</td>\n",
+       "      <td>1340</td>\n",
+       "      <td>7912</td>\n",
+       "      <td>1.5</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>1340</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1955</td>\n",
+       "      <td>0</td>\n",
+       "      <td>18810 Densmore Ave N</td>\n",
+       "      <td>Shoreline</td>\n",
+       "      <td>WA 98133</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>20140502T000000</td>\n",
+       "      <td>2384000.0</td>\n",
+       "      <td>5</td>\n",
+       "      <td>2.50</td>\n",
+       "      <td>3650</td>\n",
+       "      <td>9050</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>4</td>\n",
+       "      <td>5</td>\n",
+       "      <td>3370</td>\n",
+       "      <td>280</td>\n",
+       "      <td>1921</td>\n",
+       "      <td>0</td>\n",
+       "      <td>709 W Blaine St</td>\n",
+       "      <td>Seattle</td>\n",
+       "      <td>WA 98119</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>20140502T000000</td>\n",
+       "      <td>342000.0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>2.00</td>\n",
+       "      <td>1930</td>\n",
+       "      <td>11947</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>4</td>\n",
+       "      <td>1930</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1966</td>\n",
+       "      <td>0</td>\n",
+       "      <td>26206-26214 143rd Ave SE</td>\n",
+       "      <td>Kent</td>\n",
+       "      <td>WA 98042</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>20140502T000000</td>\n",
+       "      <td>420000.0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>2.25</td>\n",
+       "      <td>2000</td>\n",
+       "      <td>8030</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>4</td>\n",
+       "      <td>1000</td>\n",
+       "      <td>1000</td>\n",
+       "      <td>1963</td>\n",
+       "      <td>0</td>\n",
+       "      <td>857 170th Pl NE</td>\n",
+       "      <td>Bellevue</td>\n",
+       "      <td>WA 98008</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>20140502T000000</td>\n",
+       "      <td>550000.0</td>\n",
+       "      <td>4</td>\n",
+       "      <td>2.50</td>\n",
+       "      <td>1940</td>\n",
+       "      <td>10500</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>4</td>\n",
+       "      <td>1140</td>\n",
+       "      <td>800</td>\n",
+       "      <td>1976</td>\n",
+       "      <td>0</td>\n",
+       "      <td>9105 170th Ave NE</td>\n",
+       "      <td>Redmond</td>\n",
+       "      <td>WA 98052</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "              date      price  bedrooms  bathrooms  sqft_living  sqft_lot  \\\n",
+       "0  20140502T000000   313000.0         3       1.50         1340      7912   \n",
+       "1  20140502T000000  2384000.0         5       2.50         3650      9050   \n",
+       "2  20140502T000000   342000.0         3       2.00         1930     11947   \n",
+       "3  20140502T000000   420000.0         3       2.25         2000      8030   \n",
+       "4  20140502T000000   550000.0         4       2.50         1940     10500   \n",
+       "\n",
+       "   floors  waterfront  view  condition  sqft_above  sqft_basement  yr_built  \\\n",
+       "0     1.5           0     0          3        1340              0      1955   \n",
+       "1     2.0           0     4          5        3370            280      1921   \n",
+       "2     1.0           0     0          4        1930              0      1966   \n",
+       "3     1.0           0     0          4        1000           1000      1963   \n",
+       "4     1.0           0     0          4        1140            800      1976   \n",
+       "\n",
+       "   yr_renovated                    street       city  statezip country  \n",
+       "0             0      18810 Densmore Ave N  Shoreline  WA 98133     USA  \n",
+       "1             0           709 W Blaine St    Seattle  WA 98119     USA  \n",
+       "2             0  26206-26214 143rd Ave SE       Kent  WA 98042     USA  \n",
+       "3             0           857 170th Pl NE   Bellevue  WA 98008     USA  \n",
+       "4             0         9105 170th Ave NE    Redmond  WA 98052     USA  "
+      ]
+     },
+     "execution_count": 9,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# There is no 20140631T00000 ( incorrect date as there is no 31st of june), so I have changed it to 30-06-2014\n",
+    "# The date format at index 4335 is 23052014T000000 which is incorrect it should be 20140523T000000\n",
+    "dataframe.date.replace({'20140631T000000':'20140630T000000'},inplace=True)\n",
+    "dataframe.date.replace({'23052014T000000':'20140523T000000'},inplace=True)\n",
+    "# fixed date issues\n",
+    "# checking for date issues\n",
+    "date_list=[]\n",
+    "date_list=dataframe.date.tolist()\n",
+    "for date in date_list:\n",
+    "    parse(date) \n",
+    "# No More Issues\n",
+    "# Converting date into specified datetime format\n",
+    "pd.to_datetime(dataframe.date)\n",
+    "dataframe.head()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:red\">\n",
+    "<h5></h5>\n",
+    "<p>The next issue was with the values for bathrooms in the dataset <br>\n",
+    "No bathrooms should have any fraction other than .00, .5 ,.25 and .75<br>\n",
+    "In the below code these issues have been fixed </p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "#bathroom_list=dataframe.bathrooms.tolist()\n",
+    "#print (set(bathroom_list))\n",
+    "# Converting into set for a better view \n",
+    "# There are fraction values of 1.7, 2.3, 1.05,2.55 and 2.57\n",
+    "# I belive these values are either mistyped or are irregular. \n",
+    "# 1.7 should be 1.75 (5 is missing)\n",
+    "# 2.3 should be 2.25 (rounded off to 2.3 somehow)\n",
+    "# 1.05 should be 1.50 (mistyped  0 before 5)\n",
+    "# 2.57 should be 2.75 (mistyped 5 before 7)\n",
+    "# 2.55 should be 2.50\n",
+    "dataframe.bathrooms.replace({1.7:1.75,2.3:2.25,1.05:1.50,2.57:2.75,2.55:2.50},inplace=True)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:green\">\n",
+    "<h5> Irregularities have been removed</h5>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:red\">\n",
+    "<h5>Step 3 is to remove Violations of the Integrity constraints</h5>\n",
+    "<p></p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "                 date     price  bedrooms  bathrooms  sqft_living  sqft_lot  \\\n",
+      "4340  20140502T000000  440000.0         4       2.25         2160      8119   \n",
+      "4341  20140526T000000  690000.0         4       2.50         2700      8810   \n",
+      "4342  20140508T000000  375000.0         6       2.25         3206      5793   \n",
+      "4345  20140522T000000  850000.0         4       3.25         3090      6744   \n",
+      "\n",
+      "      floors  waterfront  view  condition  sqft_above  sqft_basement  \\\n",
+      "4340     1.0           0     0          3        1080           1080   \n",
+      "4341     2.0           0     0          3        2700              0   \n",
+      "4342     2.0           0     0          3        3206              0   \n",
+      "4345     2.0           0     4          3        3090              0   \n",
+      "\n",
+      "      yr_built  yr_renovated                            street       city  \\\n",
+      "4340      1966          1913                  12211 SE 65th St   Bellevue   \n",
+      "4341      2004          2003                 11659 168th Ct NE    Redmond   \n",
+      "4342      2012          1912             25921-25929 35th Pl S       Kent   \n",
+      "4345      2013          1923  19117-19123 Richmond Beach Dr NW  Shoreline   \n",
+      "\n",
+      "      statezip country  \n",
+      "4340  WA 98006     USA  \n",
+      "4341  WA 98052     USA  \n",
+      "4342  WA 98032     USA  \n",
+      "4345  WA 98177     USA  \n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Year built should be the same or should be  before Yr_Renovated\n",
+    "# So no rows should have a year built bigger than yr_renovated\n",
+    "# as no houses should be renovated before it is built\n",
+    "print (dataframe[(dataframe.yr_built>dataframe.yr_renovated) & (dataframe.yr_renovated>0) ])\n",
+    "# but we have 4 cases in which this has been happend at index 4340,4341,4342 and 4345\n",
+    "# upon inspection I belive that these values have been incorrectly place \n",
+    "# and both need to be swapped with each other\n",
+    "# At index 4340 yr_built should be 1913 and yr_renovated should be 1966\n",
+    "dataframe.loc[4340,'yr_built']=1913\n",
+    "dataframe.loc[4340,'yr_renovated']=1966\n",
+    "# At index 4341 yr_built should be 2003 and yr_renovated should be 2004\n",
+    "dataframe.loc[4341,'yr_built']=2003\n",
+    "dataframe.loc[4341,'yr_renovated']=2004\n",
+    "# At index 4342 yr_built should be 1912 and yr_renovated should be 2012\n",
+    "dataframe.loc[4342,'yr_built']=1912\n",
+    "dataframe.loc[4342,'yr_renovated']=2012\n",
+    "# At index 4345 yr_built should be 1923 and yr_renovated should be 2013\n",
+    "dataframe.loc[4345,'yr_built']=1923\n",
+    "dataframe.loc[4345,'yr_renovated']=2013\n",
+    "# Now no more such issues\n",
+    "print (dataframe[(dataframe.yr_built>dataframe.yr_renovated) & (dataframe.yr_renovated>0) ])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "                 date     price  bedrooms  bathrooms  sqft_living  sqft_lot  \\\n",
+      "4338  20140710T000000  670000.0         3        2.5         1280      1438   \n",
+      "4339  20140701T000000  202000.0         1        1.0          890       833   \n",
+      "\n",
+      "      floors  waterfront  view  condition  sqft_above  sqft_basement  \\\n",
+      "4338     2.0           0     0          3        1280           1420   \n",
+      "4339     1.0           0     0          4         590              0   \n",
+      "\n",
+      "      yr_built  yr_renovated              street     city  statezip country  \n",
+      "4338      2003             0  746 Boylston Ave E  Seattle  WA 98102     USA  \n",
+      "4339      1926             0    701-711 26th Ave  Seattle  WA 98122     USA  \n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n"
+     ]
+    }
+   ],
+   "source": [
+    "# sqft_living should be sqft_basement +  sqft_above\n",
+    "# floor must be >0 and >1 if it has a value for sqft_basement\n",
+    "print (dataframe[dataframe.sqft_living!=dataframe.sqft_basement+dataframe.sqft_above])\n",
+    "# There are two such cases which are not correct\n",
+    "# First case is at index 4338 where sqft_living is 1280 \n",
+    "# but sqft_basement is 1420 and sqft_above is 1280\n",
+    "# As the basement cannot be more than the sqft_living \n",
+    "# the value of basement is incorrect\n",
+    "# So The value in sqft_basement is 1420 because of some typing error\n",
+    "# It should be replaced with 140\n",
+    "# So now we have both sqft_basement and sqft_above accurate values \n",
+    "# updating sqft_living as well\n",
+    "dataframe.loc[4338,'sqft_basement']=140\n",
+    "dataframe.loc[4338,'sqft_living']=140+1280\n",
+    "# The second case is at index 4339 where sqft_living is 890\n",
+    "# but sqft_basement is 0 and sqft_above is 590\n",
+    "# My assumption based for this data set is that\n",
+    "# sqft_lot should be greater than or equal to sqft_living\n",
+    "# here sqft_living is higher than sqft_lot which is not possible\n",
+    "# so the value of sqft_above is correct\n",
+    "dataframe.loc[4339,'sqft_living']=dataframe.loc[4339,'sqft_above']\n",
+    "# No More issues like that are found\n",
+    "print (dataframe[dataframe.sqft_living!=dataframe.sqft_basement+dataframe.sqft_above])\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:green\">\n",
+    "<h5> Integrity issues have been fixed</h5>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:red\">\n",
+    "<h5>Next step is to remove duplicate records</h5>\n",
+    "<p>In the below code duplicate records have been dealt with </p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "                 date     price  bedrooms  bathrooms  sqft_living  sqft_lot  \\\n",
+      "1017  20140520T000000  300000.0         6       5.25         2860      5682   \n",
+      "1024  20140520T000000  206000.0         4       2.00         1700      6025   \n",
+      "\n",
+      "      floors  waterfront  view  condition  sqft_above  sqft_basement  \\\n",
+      "1017     2.0           0     0          3        2860              0   \n",
+      "1024     1.0           0     0          3        1700              0   \n",
+      "\n",
+      "      yr_built  yr_renovated         street    city  statezip country  \n",
+      "1017      1978             0  606 5th St SE  Auburn  WA 98002     USA  \n",
+      "1024      1978             0  606 5th St SE  Auburn  WA 98002     USA  \n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "(4600, 18)"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# If the address and the date sold is the same it is the same property\n",
+    "# Two Records with same address and date are found\n",
+    "#print (dataframe[dataframe.duplicated(['city','street','date'],keep='first')])\n",
+    "#print (dataframe[dataframe.duplicated(['city','street','date'],keep='last')])\n",
+    "# Records 1024 and 1017 are the same\n",
+    "# Lets examine these records\n",
+    "print (dataframe[(dataframe.index==1024) | (dataframe.index==1017)])\n",
+    "# Not Dropping record 1024 or 1017 because both records have different data. They might be a date error\n",
+    "# somewhere but we cannot be certain which date to impute here. So we leave them as it is.\n",
+    "\n",
+    "\n",
+    "# Records 4336 and 4337 are exactly the same \n",
+    "# Lets examine these records\n",
+    "# They both contain the exact same data. So deleting one of them.\n",
+    "dataframe[(dataframe.index==4336) | (dataframe.index==4337)]\n",
+    "dataframe.drop(dataframe.index[4337],inplace=True)\n",
+    "dataframe.shape # now number of rows are 4600"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "4600\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Fixing Missing Values in Year Renovated\n",
+    "# We find that some have 0's in year renovated. we fill these values by inserting yr_build values in yr_renovated for\n",
+    "# these records\n",
+    "# Finding 0's records \n",
+    "# Changing to yr_built\n",
+    "yr_built_list=[]\n",
+    "yr_renovated_list=[]\n",
+    "new_renovated_list=[]\n",
+    "yr_built_list=dataframe['yr_built'].tolist()\n",
+    "yr_renovated_list=dataframe['yr_renovated'].tolist()\n",
+    "print (len(yr_built_list))\n",
+    "for i in range(0,len(yr_renovated_list)):\n",
+    "    if yr_renovated_list[i]==0: # If 0 is found append built year value\n",
+    "        new_renovated_list.append(yr_built_list[i])\n",
+    "    else:\n",
+    "        new_renovated_list.append(yr_renovated_list[i]) # else append renovated year value\n",
+    "dataframe['yr_renovated']=new_renovated_list # Updating yr_renovated_list\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:green\">\n",
+    "<h5> Duplications have been removed</h5>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:red\">\n",
+    "<h5>Next step is to find and impute missing values</h5>\n",
+    "<p>In the below code I am searching for Nan or Missing values for Object and Date Datatypes</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "False\n",
+      "False\n",
+      "False\n",
+      "False\n",
+      "False\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Checking for Missing Values for object and date types \n",
+    "# First checking date (date type) for Null Values\n",
+    "print (dataframe.date.isnull().values.any())\n",
+    "# No missing values found\n",
+    "# Now checking object data type\n",
+    "# Checking Street\n",
+    "print (dataframe.street.isnull().values.any())\n",
+    "# No missing values found\n",
+    "# Checking city\n",
+    "print (dataframe.city.isnull().values.any())\n",
+    "# No missing values found\n",
+    "# Checking State Zip\n",
+    "print (dataframe.statezip.isnull().values.any())\n",
+    "# No missing values found\n",
+    "# Checking Country\n",
+    "print (dataframe.country.isnull().values.any())\n",
+    "# No missing values found"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<p style='color:green'>No missing values found </p>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:red\">\n",
+    "<p>In the below code I am searching for Missing values for int and float Datatypes</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "248\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "date              object\n",
+       "price            float64\n",
+       "bedrooms           int64\n",
+       "bathrooms        float64\n",
+       "sqft_living        int64\n",
+       "sqft_lot           int64\n",
+       "floors           float64\n",
+       "waterfront         int64\n",
+       "view               int64\n",
+       "condition          int64\n",
+       "sqft_above         int64\n",
+       "sqft_basement      int64\n",
+       "yr_built           int64\n",
+       "yr_renovated       int64\n",
+       "street            object\n",
+       "city              object\n",
+       "statezip          object\n",
+       "country           object\n",
+       "dtype: object"
+      ]
+     },
+     "execution_count": 16,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Checking for Float (price,bathroom and floors)\n",
+    "# Checking for bathrooms value  < 0.25 as 0.25 is the minimum possible value \n",
+    "dataframe[dataframe.bathrooms <0.25]\n",
+    "# As there are only two records at index 2365 and 3209 which have these values\n",
+    "# it is possible that these are just large properties for recreational purposes. \n",
+    "# and not livable houses. So these missing values are justified\n",
+    "# Checking for floors <0\n",
+    "dataframe[dataframe.floors<0]\n",
+    "# There are no missing values for floors\n",
+    "\n",
+    "# Checking for price < 0 \n",
+    "#There are 248 Missing Prices for records\n",
+    "print (len(dataframe[dataframe.price==0]))\n",
+    "# These missing prices would be dealth would be imputed after checking for all the other missing value\n",
+    "dataframe.dtypes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "1295650"
+      ]
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "round(1295648,-1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "                 date      price  bedrooms  bathrooms  sqft_living  sqft_lot  \\\n",
+      "2365  20140612T000000  1095000.0         0        0.0         3064      4764   \n",
+      "3209  20140624T000000  1295648.0         0        0.0         4810     28008   \n",
+      "\n",
+      "      floors  waterfront  view  condition  sqft_above  sqft_basement  \\\n",
+      "2365     3.5           0     2          3        3064              0   \n",
+      "3209     2.0           0     0          3        4810              0   \n",
+      "\n",
+      "      yr_built  yr_renovated            street     city  statezip country  \n",
+      "2365      1990          1990     814 E Howe St  Seattle  WA 98102     USA  \n",
+      "3209      1990          1990  20418 NE 64th Pl  Redmond  WA 98053     USA  \n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n",
+      "Empty DataFrame\n",
+      "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+      "Index: []\n"
+     ]
+    }
+   ],
+   "source": [
+    "# checking integer type values\n",
+    "# Checking bedrooms for missing values\n",
+    "# As there are only two records at index 2365 and 3209 which have these values\n",
+    "# it is possible that these are just large properties for recreational purposes. \n",
+    "# and not livable houses. So these missing values are justified\n",
+    "print (dataframe[dataframe.bedrooms<=0])\n",
+    "\n",
+    "# Checking for Sqft_lot  if it is <0 \n",
+    "print (dataframe[dataframe.sqft_lot <0])# No such issues are found\n",
+    "\n",
+    "# Checking for waterfront if it is <0 \n",
+    "print (dataframe[dataframe.waterfront <0])# No such issues are found\n",
+    "\n",
+    "# Checking for view  if it is <0 \n",
+    "print (dataframe[dataframe.view <0])# No such issues are found\n",
+    "\n",
+    "# Checking for condition  if it is <0 \n",
+    "print (dataframe[dataframe.condition <0])# No such issues are found\n",
+    "\n",
+    "# Checking for sqft_above  if it is <0 \n",
+    "print (dataframe[dataframe.sqft_above <0])# No such issues are found\n",
+    "\n",
+    "# Checking for sqft_basement  if it is <0 \n",
+    "print (dataframe[dataframe.sqft_basement <0])# No such issues are found\n",
+    "\n",
+    "# Checking for yr_built  if it is <1900\n",
+    "print (dataframe[dataframe.yr_built <1900])# No such issues are found\n",
+    "\n",
+    "# Checking for yr_renovated if it is <1900\n",
+    "print (dataframe[dataframe.yr_renovated <1900])# No such issues are found\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<p style='color:green'>No missing values found in columns except Price</p>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<p style='color:red'>Bofore Fixing Price Values, we need to find and remove outliers for price</p>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:red\">\n",
+    "<h5>Next step is to detect outliers in the dataset</h5>\n",
+    "<p>In the below code I am searching for  outliers in price</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 720x576 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# Now checking price for Outliers by showing boxplots\n",
+    "plt.figure(figsize=(10,8))\n",
+    "dataframe.boxplot()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [],
+   "source": [
+    "# As we can see there are a lot of outliers in the prices column and sqft_lot\n",
+    "# if we try to predict the absent prices, these outliers will give us an \n",
+    "# incorrect estimate\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 720x576 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# Now checking price for Outliers in the price by showing boxplots\n",
+    "plt.figure(figsize=(10,8))\n",
+    "dataframe.boxplot(column=['price'])\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>date</th>\n",
+       "      <th>price</th>\n",
+       "      <th>bedrooms</th>\n",
+       "      <th>bathrooms</th>\n",
+       "      <th>sqft_living</th>\n",
+       "      <th>sqft_lot</th>\n",
+       "      <th>floors</th>\n",
+       "      <th>waterfront</th>\n",
+       "      <th>view</th>\n",
+       "      <th>condition</th>\n",
+       "      <th>sqft_above</th>\n",
+       "      <th>sqft_basement</th>\n",
+       "      <th>yr_built</th>\n",
+       "      <th>yr_renovated</th>\n",
+       "      <th>street</th>\n",
+       "      <th>city</th>\n",
+       "      <th>statezip</th>\n",
+       "      <th>country</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2286</th>\n",
+       "      <td>20140611T000000</td>\n",
+       "      <td>7062500.0</td>\n",
+       "      <td>5</td>\n",
+       "      <td>4.5</td>\n",
+       "      <td>10040</td>\n",
+       "      <td>37325</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>3</td>\n",
+       "      <td>7680</td>\n",
+       "      <td>2360</td>\n",
+       "      <td>1940</td>\n",
+       "      <td>2001</td>\n",
+       "      <td>4442 95th Ave NE</td>\n",
+       "      <td>Bellevue</td>\n",
+       "      <td>WA 98004</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4347</th>\n",
+       "      <td>20140623T000000</td>\n",
+       "      <td>12899000.0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>2.5</td>\n",
+       "      <td>2190</td>\n",
+       "      <td>11394</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>1550</td>\n",
+       "      <td>640</td>\n",
+       "      <td>1956</td>\n",
+       "      <td>1956</td>\n",
+       "      <td>5426 40th Ave W</td>\n",
+       "      <td>Seattle</td>\n",
+       "      <td>WA 98199</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4351</th>\n",
+       "      <td>20140703T000000</td>\n",
+       "      <td>26590000.0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>1180</td>\n",
+       "      <td>7793</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>4</td>\n",
+       "      <td>1180</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1992</td>\n",
+       "      <td>1992</td>\n",
+       "      <td>12005 SE 219th Ct</td>\n",
+       "      <td>Kent</td>\n",
+       "      <td>WA 98031</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                 date       price  bedrooms  bathrooms  sqft_living  sqft_lot  \\\n",
+       "2286  20140611T000000   7062500.0         5        4.5        10040     37325   \n",
+       "4347  20140623T000000  12899000.0         3        2.5         2190     11394   \n",
+       "4351  20140703T000000  26590000.0         3        2.0         1180      7793   \n",
+       "\n",
+       "      floors  waterfront  view  condition  sqft_above  sqft_basement  \\\n",
+       "2286     2.0           1     2          3        7680           2360   \n",
+       "4347     1.0           0     0          3        1550            640   \n",
+       "4351     1.0           0     0          4        1180              0   \n",
+       "\n",
+       "      yr_built  yr_renovated             street      city  statezip country  \n",
+       "2286      1940          2001   4442 95th Ave NE  Bellevue  WA 98004     USA  \n",
+       "4347      1956          1956    5426 40th Ave W   Seattle  WA 98199     USA  \n",
+       "4351      1992          1992  12005 SE 219th Ct      Kent  WA 98031     USA  "
+      ]
+     },
+     "execution_count": 22,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# The extreme outliers for the price data are below\n",
+    "dataframe[dataframe.price >5000000]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 720x576 with 1 Axes>"
+      ]
+     },
+     "metadata": {
+      "needs_background": "light"
+     },
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# Now checking price for Outliers in the price by showing boxplots\n",
+    "plt.figure(figsize=(10,8))\n",
+    "dataframe.boxplot(column=['sqft_lot'])\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>date</th>\n",
+       "      <th>price</th>\n",
+       "      <th>bedrooms</th>\n",
+       "      <th>bathrooms</th>\n",
+       "      <th>sqft_living</th>\n",
+       "      <th>sqft_lot</th>\n",
+       "      <th>floors</th>\n",
+       "      <th>waterfront</th>\n",
+       "      <th>view</th>\n",
+       "      <th>condition</th>\n",
+       "      <th>sqft_above</th>\n",
+       "      <th>sqft_basement</th>\n",
+       "      <th>yr_built</th>\n",
+       "      <th>yr_renovated</th>\n",
+       "      <th>street</th>\n",
+       "      <th>city</th>\n",
+       "      <th>statezip</th>\n",
+       "      <th>country</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>1078</th>\n",
+       "      <td>20140521T000000</td>\n",
+       "      <td>542500.0</td>\n",
+       "      <td>5</td>\n",
+       "      <td>3.25</td>\n",
+       "      <td>3010</td>\n",
+       "      <td>1074218</td>\n",
+       "      <td>1.5</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>5</td>\n",
+       "      <td>2010</td>\n",
+       "      <td>1000</td>\n",
+       "      <td>1931</td>\n",
+       "      <td>1931</td>\n",
+       "      <td>16200-16398 252nd Ave SE</td>\n",
+       "      <td>Issaquah</td>\n",
+       "      <td>WA 98027</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2480</th>\n",
+       "      <td>20140613T000000</td>\n",
+       "      <td>849900.0</td>\n",
+       "      <td>2</td>\n",
+       "      <td>2.00</td>\n",
+       "      <td>2280</td>\n",
+       "      <td>641203</td>\n",
+       "      <td>2.0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>0</td>\n",
+       "      <td>3</td>\n",
+       "      <td>2280</td>\n",
+       "      <td>0</td>\n",
+       "      <td>1990</td>\n",
+       "      <td>1990</td>\n",
+       "      <td>9326 SW 216th St</td>\n",
+       "      <td>Vashon</td>\n",
+       "      <td>WA 98070</td>\n",
+       "      <td>USA</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                 date     price  bedrooms  bathrooms  sqft_living  sqft_lot  \\\n",
+       "1078  20140521T000000  542500.0         5       3.25         3010   1074218   \n",
+       "2480  20140613T000000  849900.0         2       2.00         2280    641203   \n",
+       "\n",
+       "      floors  waterfront  view  condition  sqft_above  sqft_basement  \\\n",
+       "1078     1.5           0     0          5        2010           1000   \n",
+       "2480     2.0           0     0          3        2280              0   \n",
+       "\n",
+       "      yr_built  yr_renovated                    street      city  statezip  \\\n",
+       "1078      1931          1931  16200-16398 252nd Ave SE  Issaquah  WA 98027   \n",
+       "2480      1990          1990          9326 SW 216th St    Vashon  WA 98070   \n",
+       "\n",
+       "     country  \n",
+       "1078     USA  \n",
+       "2480     USA  "
+      ]
+     },
+     "execution_count": 24,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "dataframe[dataframe['sqft_lot']> 600000]\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Creating a new dataframe without these outliers\n",
+    "new_dataframe=dataframe[(dataframe.price <= 5000000 ) & (dataframe.sqft_lot <= 600000)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "The number of rows having price equal to 0 is 248\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Checking how many rows has price missing\n",
+    "print (\"The number of rows having price equal to 0 is \"+str(len(new_dataframe[new_dataframe.price == 0])))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/anaconda3/lib/python3.7/site-packages/pandas/core/frame.py:3697: SettingWithCopyWarning: \n",
+      "A value is trying to be set on a copy of a slice from a DataFrame\n",
+      "\n",
+      "See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy\n",
+      "  errors=errors)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Using Linear Model for price imputation\n",
+    "# As linear regression cant work on object datatype \n",
+    "# we remove the object datatype\n",
+    "dataframe_for_regression=new_dataframe\n",
+    "dataframe_for_regression.drop(['street','city','statezip','country','date'], axis =1,inplace = True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/anaconda3/lib/python3.7/site-packages/ipykernel_launcher.py:8: SettingWithCopyWarning: \n",
+      "A value is trying to be set on a copy of a slice from a DataFrame\n",
+      "\n",
+      "See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy\n",
+      "  \n"
+     ]
+    }
+   ],
+   "source": [
+    "# Creating and Fitting a Linear Regression Model\n",
+    "lm=LinearRegression()\n",
+    "X=dataframe_for_regression[[x for x in dataframe_for_regression.columns if x!= 'price']]\n",
+    "y=dataframe_for_regression.price\n",
+    "dataframe_for_regression.head()\n",
+    "lm.fit(X,y)\n",
+    "#predictions = lm.predict(X)\n",
+    "dataframe['price'][dataframe['price'] == 0] = lm.predict(dataframe.drop(['price','date','street','city','statezip','country'],axis=1))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)"
+      ]
+     },
+     "execution_count": 29,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Splitting train and test dataset\n",
+    "X_train, X_test, y_train, y_test = train_test_split(dataframe.iloc[:,2:14],dataframe.iloc[:,1:2],random_state=112)\n",
+    "lm.fit(X_train,y_train)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Fitting the model on training dataset\n",
+    "lm.fit(X_test,y_test)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>date</th>\n",
+       "      <th>price</th>\n",
+       "      <th>bedrooms</th>\n",
+       "      <th>bathrooms</th>\n",
+       "      <th>sqft_living</th>\n",
+       "      <th>sqft_lot</th>\n",
+       "      <th>floors</th>\n",
+       "      <th>waterfront</th>\n",
+       "      <th>view</th>\n",
+       "      <th>condition</th>\n",
+       "      <th>sqft_above</th>\n",
+       "      <th>sqft_basement</th>\n",
+       "      <th>yr_built</th>\n",
+       "      <th>yr_renovated</th>\n",
+       "      <th>street</th>\n",
+       "      <th>city</th>\n",
+       "      <th>statezip</th>\n",
+       "      <th>country</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "Empty DataFrame\n",
+       "Columns: [date, price, bedrooms, bathrooms, sqft_living, sqft_lot, floors, waterfront, view, condition, sqft_above, sqft_basement, yr_built, yr_renovated, street, city, statezip, country]\n",
+       "Index: []"
+      ]
+     },
+     "execution_count": 31,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# All prices have been predicted\n",
+    "dataframe[dataframe.price == 0]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "The Accuracy rate is  64 %\n"
+     ]
+    }
+   ],
+   "source": [
+    "accuracy = lm.score(X_test, y_test)\n",
+    "print (\"The Accuracy rate is  {} %\".format(int(round(accuracy * 100))))\n",
+    "# The accuracy of the test is 64%"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<div style=\"color:green\">\n",
+    "<h5>Missing Values have been identified and fixed</h5>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "<div style=\"color:green\">\n",
+    "<h5>Inconsistency and inhomogeneity</h5>\n",
+    "<p>\n",
+    "All Inconsistency and inhomegenity have been removed. The dataset is ready for data modelling</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "collapsed": true
+   },
+   "source": [
+    "<div style=\"color:green\">\n",
+    "<h5>Writing the CSV File</h5>\n",
+    "<p>\n",
+    "The list of attributes are : 'date', 'price', 'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot',\n",
+    "       'floors', 'waterfront', 'view', 'condition', 'sqft_above',\n",
+    "       'sqft_basement', 'yr_built', 'yr_renovated', 'street', 'city',\n",
+    "       'statezip', 'country' <br></p>\n",
+    "<p style=\"color:red\">Note: There is no Index Attribute in the CSV file</p>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "date              object\n",
+      "price            float64\n",
+      "bedrooms           int64\n",
+      "bathrooms        float64\n",
+      "sqft_living        int64\n",
+      "sqft_lot           int64\n",
+      "floors           float64\n",
+      "waterfront         int64\n",
+      "view               int64\n",
+      "condition          int64\n",
+      "sqft_above         int64\n",
+      "sqft_basement      int64\n",
+      "yr_built           int64\n",
+      "yr_renovated       int64\n",
+      "street            object\n",
+      "city              object\n",
+      "statezip          object\n",
+      "country           object\n",
+      "dtype: object\n"
+     ]
+    }
+   ],
+   "source": [
+    "print (dataframe.dtypes)\n",
+    "dataframe.to_csv('data_clean.csv',index=False)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<h3 style=\"color:green\">Task 2 Finished </h3>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
